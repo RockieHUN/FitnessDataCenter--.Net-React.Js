@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import NewClientComponent from './newClientComponent';
+import NewClientComponent from './NewClientComponent';
 import {Button} from 'react-bootstrap';
 
 export class Home extends Component {
@@ -27,7 +27,7 @@ export class Home extends Component {
   }
 
   toggleNewClientForm(){
-    this.setState({newClientButton : !this.state.showNewClientForm});  
+    this.setState({showNewClientForm : !this.state.showNewClientForm});  
   }
 
   createUserTable(clients){
@@ -66,7 +66,7 @@ export class Home extends Component {
       ? <p> Loading ... </p>
       : this.createUserTable(this.state.clients);
 
-    let NewClientForm = NewClientComponent(this.state.showNewClientForm);
+    
 
     return (
       <div>
@@ -76,7 +76,7 @@ export class Home extends Component {
           <Button> Add </Button>
         </div>
 
-        {NewClientForm}
+        <NewClientComponent show={this.state.showNewClientForm} />
         
         <div>
           {clientList}

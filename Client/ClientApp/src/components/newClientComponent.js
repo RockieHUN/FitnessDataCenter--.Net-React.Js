@@ -5,59 +5,96 @@ import {Col} from 'react-bootstrap';
 import {Button} from 'react-bootstrap';
 
 
-function NewClientComponent(show){
+function NewClientComponent(props){
 
     const [showExtra, toggle] = useState(false);
 
-    if (!show) return (<div></div>)
+    let exFileds;
+    if (showExtra) exFileds = extraFields();
+
+    if (!props.show) return (<div></div>)
     else
     return(
-        <Form>
+        <div>
+            <Form>
 
-             <Form.Group as={Row} controlId="name_input">
-                <Form.Label column sm="2"> Name </Form.Label>
-                <Col sm="10">
-                    <Form.Control placeholder="Tony Stark" />
-                </Col>
+            <Form.Group as={Row} controlId="name_input">
+            <Form.Label column sm="2"> Name </Form.Label>
+            <Col sm="10">
+                <Form.Control placeholder="Tony Stark" />
+            </Col>
             </Form.Group>
 
             <Form.Group as={Row} controlId="email_input">
-                <Form.Label column sm="2"> Email </Form.Label>
-                <Col sm="10">
-                    <Form.Control placeholder="email@example.com" />
-                </Col>
+            <Form.Label column sm="2"> Email </Form.Label>
+            <Col sm="10">
+                <Form.Control type='email' placeholder="email@example.com" />
+            </Col>
             </Form.Group>
 
             <Form.Group as={Row} controlId="telephone_input">
-                <Form.Label column sm="2"> Telephone </Form.Label>
-                <Col sm="10">
-                    <Form.Control placeholder="07401112345611" />
-                </Col>
+            <Form.Label column sm="2"> Telephone </Form.Label>
+            <Col sm="10">
+                <Form.Control placeholder="07401112345611" />
+            </Col>
             </Form.Group>
 
             <Form.Group as={Row} controlId="address_input">
-                <Form.Label column sm="2"> Address </Form.Label>
-                <Col sm="10">
-                    <Form.Control placeholder="Tg. Mures, 234" />
-                </Col>
+            <Form.Label column sm="2"> Address </Form.Label>
+            <Col sm="10">
+                <Form.Control placeholder="Tg. Mures, 234" />
+            </Col>
             </Form.Group>
 
             <Form.Group as={Row} controlId="cnp_input">
-                <Form.Label column sm="2"> CNP </Form.Label>
-                <Col sm="10">
-                    <Form.Control placeholder="2938183740539" />
-                </Col>
+            <Form.Label column sm="2"> CNP </Form.Label>
+            <Col sm="10">
+                <Form.Control placeholder="2938183740539" />
+            </Col>
             </Form.Group>
 
             <Form.Check 
-                onClick={ () => toggle(!showExtra)}
-                type='checkbox'
-                label='AddTicket'
+            onClick={ () => toggle(!showExtra)}
+            type='checkbox'
+            label='AddTicket'
             />
+            </Form>
+            {exFileds}
 
             <Button> Save </Button>
-            
-        </Form>
+        </div>
+        
+    )
+}
+
+function extraFields(){
+    return(
+        <Form>
+            <Form.Group as={Row} controlId="validDays_input">
+                <Form.Label column sm="2"> Valid days </Form.Label>
+                <Col sm="10">
+                    <Form.Control type='number' placeholder="1" />
+                </Col>
+            </Form.Group>
+            <Form.Group as={Row} controlId="numOfUsages_input">
+                <Form.Label column sm="2"> Number of usages </Form.Label>
+                <Col sm="10">
+                    <Form.Control type='number'placeholder="1" />
+                </Col>
+            </Form.Group>
+            <Form.Group as={Row} controlId="numOfUsagesPerDay_input">
+                <Form.Label column sm="2"> Number of usages per day </Form.Label>
+                <Col sm="10">
+                    <Form.Control type='number' placeholder="1" />
+                </Col>
+            </Form.Group>
+            <Form.Group as={Row} controlId="room_input">
+                <Form.Label column sm="2"> Room </Form.Label>
+                <Col sm="10">
+                    <Form.Control type='number' placeholder="1" />
+                </Col>
+            </Form.Group>
+        </Form>   
     )
 }
 
