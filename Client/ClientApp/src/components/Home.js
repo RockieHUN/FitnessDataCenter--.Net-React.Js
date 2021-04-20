@@ -1,11 +1,16 @@
 import React, { Component } from 'react';
+import NewClientComponent from './newClientComponent';
+import {Button} from 'react-bootstrap';
 
 export class Home extends Component {
   static displayName = Home.name;
 
   constructor(props){
     super(props);
-    this.state = { loading : true , error:"", clients : []};
+    this.state = { loading : true , error:"", clients : [], showNewClientForm: false};
+
+    //bindings
+    this.toggleNewClientForm = this.toggleNewClientForm.bind(this);
   }
 
   componentDidMount(){
@@ -19,6 +24,10 @@ export class Home extends Component {
             let data = await response.json();
             this.setState({ clients: data, loading: false});
         }
+  }
+
+  toggleNewClientForm(){
+    this.setState({newClientButton : !this.state.showNewClientForm});  
   }
 
   createUserTable(clients){
@@ -57,19 +66,25 @@ export class Home extends Component {
       ? <p> Loading ... </p>
       : this.createUserTable(this.state.clients);
 
+    let NewClientForm = NewClientComponent(this.state.showNewClientForm);
+
     return (
       <div>
         <h1> Fitness Data Center</h1>
-
         <div> 
-          <button> New Client</button>
-          <button> Add </button>
+          <Button onClick = {this.toggleNewClientForm}> New Client</Button>
+          <Button> Add </Button>
         </div>
 
+        {NewClientForm}
+        
         <div>
           {clientList}
         </div>
+        
       </div>
     );
   }
 }
+
+
