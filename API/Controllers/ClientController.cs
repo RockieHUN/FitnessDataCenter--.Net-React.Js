@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Cors;
 namespace API.Controllers
 {
     [EnableCors]
-    [Route("api/controller")]
+    [Route("api/Client")]
     [ApiController]
     public class ClientController : ControllerBase
     {
@@ -31,11 +31,7 @@ namespace API.Controllers
             return await _context.client.ToListAsync();
         }
 
-        [HttpGet("ListRooms")]
-        public async Task<ActionResult<IEnumerable<Room>>> listRooms()
-        {
-            return await _context.room.ToListAsync();
-        }
+        
 
 
         [HttpGet("GetClient/{id}")]
@@ -50,36 +46,6 @@ namespace API.Controllers
 
             return client;
         }
-
-        /*[HttpPut("RegisterClient")]
-        public async Task<IActionResult> PutClient(Client client)
-        {
-
-            if (id != client.id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(client).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ClientExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }*/
 
         [HttpPost("RegisterClient")]
         public async Task<ActionResult<Client>> PostClient(Client client)
@@ -124,6 +90,37 @@ namespace API.Controllers
         {
             return _context.client.Any(e => e.id == id);
         }
+
+
+        /*[HttpPut("RegisterClient")]
+        public async Task<IActionResult> PutClient(Client client)
+        {
+
+            if (id != client.id)
+            {
+                return BadRequest();
+            }
+
+            _context.Entry(client).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!ClientExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
+        }*/
 
         [HttpGet("CreateDummy")]
         public async Task<IActionResult> CreateDummy()

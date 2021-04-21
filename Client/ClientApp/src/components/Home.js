@@ -18,7 +18,7 @@ export class Home extends Component {
   }
 
   async requestUsers(){
-    const response = await fetch('https://localhost:44312/api/controller/ListClients');
+    const response = await fetch('https://localhost:44312/api/Client/ListClients');
         if(!response.ok) this.setState({ error: "Failed to load clients", loading: false});
         else{
             let data = await response.json();
@@ -73,7 +73,6 @@ export class Home extends Component {
         <h1> Fitness Data Center</h1>
         <div> 
           <Button onClick = {this.toggleNewClientForm}> New Client</Button>
-          <Button> Add </Button>
         </div>
 
         <NewClientComponent show={this.state.showNewClientForm} />
@@ -81,7 +80,6 @@ export class Home extends Component {
         <div>
           {clientList}
         </div>
-        
       </div>
     );
   }
