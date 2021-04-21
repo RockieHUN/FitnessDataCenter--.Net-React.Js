@@ -12,61 +12,32 @@ using Microsoft.AspNetCore.Cors;
 namespace API.Controllers
 {
     [EnableCors]
-    [Route("api/[controller]")]
+    [Route("api/controller")]
     [ApiController]
     public class ClientController : ControllerBase
     {
-        private readonly ClientContext _context;
-        public static bool isDummmyGenerated = false;
+        private readonly MyContext _context;
+       
 
-        public ClientController(ClientContext context)
+        public ClientController(MyContext context)
         {
-            _context = context;
-
-            if (!isDummmyGenerated)
-            {
-                createDummmyData();
-                isDummmyGenerated = true;
-            }
-            
+            _context = context;            
         }
 
-        private void createDummmyData()
-        {
-            _context.Add(new Client{
-                Name = "Joco", 
-                Address = "Tg. Mures",
-                Telephone ="072222222222",
-                Email = "asd@asd.com",
-                RegistrationDate = DateTime.Now,
-                CNP = "2211334121234",
-                BarCode = "21301",
-                IsDeleted = false
-            }
-            );
-            _context.Add(new Client
-            {
-                Name = "Csilla",
-                Address = "Cluj Napoca",
-                Telephone = "072222222222",
-                Email = "asd2@asd.com",
-                RegistrationDate = DateTime.Now,
-                CNP = "22661334121234",
-                BarCode = "91291",
-                IsDeleted = false
-            }
-            );
-            _context.SaveChangesAsync();
-        }
-
-        
+              
         [HttpGet("ListClients")]
-        public async Task<ActionResult<IEnumerable<Client>>> Getclient()
+        public async Task<ActionResult<IEnumerable<Client>>> listClients()
         {
             return await _context.client.ToListAsync();
         }
 
-     
+        [HttpGet("ListRooms")]
+        public async Task<ActionResult<IEnumerable<Room>>> listRooms()
+        {
+            return await _context.room.ToListAsync();
+        }
+
+
         [HttpGet("GetClient/{id}")]
         public async Task<ActionResult<Client>> GetClient(int id)
         {
@@ -153,5 +124,53 @@ namespace API.Controllers
         {
             return _context.client.Any(e => e.id == id);
         }
+
+        [HttpGet("CreateDummy")]
+        public async Task<IActionResult> CreateDummy()
+        {
+            _context.client.Add(new Client
+            {
+                Name = "Joco",
+                Address = "Tg. Mures",
+                Telephone = "072222222222",
+                Email = "asd@asd.com",
+                RegistrationDate = DateTime.Now,
+                CNP = "2211334121234",
+                BarCode = "21301",
+                IsDeleted = false
+            }
+           );
+            _context.client.Add(new Client
+            {
+                Name = "Csilla",
+                Address = "Cluj Napoca",
+                Telephone = "072222222222",
+                Email = "asd2@asd.com",
+                RegistrationDate = DateTime.Now,
+                CNP = "22661334121234",
+                BarCode = "91291",
+                IsDeleted = false
+            }
+            );
+
+            _context.room.Add(new Room
+            {
+                Name = "A12"
+            });
+
+            _context.room.Add(new Room
+            {
+                Name = "B22"
+            });
+
+
+
+
+            _ = _context.SaveChangesAsync();
+            return NoContent();
+        }
+
+
+        
     }
 }

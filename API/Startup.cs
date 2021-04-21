@@ -38,13 +38,14 @@ namespace API
                         builder.WithOrigins("https://localhost:44315").AllowAnyHeader().AllowAnyMethod();
                     }
                     );
-            }
-                );
+            });
 
             services.AddControllers();
 
-            services.AddDbContext<ClientContext>(opt =>
+            services.AddDbContext<MyContext>(opt =>
               opt.UseInMemoryDatabase("clients"));
+
+
 
             services.AddSwaggerGen(c =>
             {

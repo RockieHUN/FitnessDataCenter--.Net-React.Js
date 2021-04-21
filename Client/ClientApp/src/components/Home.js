@@ -18,7 +18,7 @@ export class Home extends Component {
   }
 
   async requestUsers(){
-    const response = await fetch('https://localhost:44312/api/Client/ListClients');
+    const response = await fetch('https://localhost:44312/api/controller/ListClients');
         if(!response.ok) this.setState({ error: "Failed to load clients", loading: false});
         else{
             let data = await response.json();

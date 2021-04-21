@@ -2,17 +2,22 @@
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace API.Database
 {
-    public class ClientContext : DbContext
+    public class MyContext : DbContext
     {
-        public ClientContext(DbContextOptions<ClientContext> options) : base(options)
+        
+        public MyContext(DbContextOptions<MyContext> options) : base(options)
         {
-
         }
         public DbSet<Client> client { get; set; }
+        public DbSet<Room> room { get; set; }
+
+
+       
     }
 }
