@@ -11,6 +11,7 @@ export class Home extends Component {
 
     //bindings
     this.toggleNewClientForm = this.toggleNewClientForm.bind(this);
+    this.requestUsers = this.requestUsers.bind(this);
   }
 
   componentDidMount(){
@@ -75,7 +76,7 @@ export class Home extends Component {
           <Button onClick = {this.toggleNewClientForm}> New Client</Button>
         </div>
 
-        <NewClientComponent show={this.state.showNewClientForm} />
+        <NewClientComponent show={this.state.showNewClientForm} requestUsers={this.requestUsers} />
         
         <div>
           {clientList}

@@ -3,36 +3,35 @@ import {Form} from 'react-bootstrap';
 import {Row} from 'react-bootstrap';
 import {Col} from 'react-bootstrap';
 import {Button} from 'react-bootstrap';
+import { propTypes } from 'react-bootstrap/esm/Image';
 
+let formInfo = {
+    client :{
+        Name: "",
+        Email: "",
+        Telephone: "",
+        Address:"",
+        CNP:""
+    },
+    ticket : {
+        ValidDays: 0,
+        MaxUsages : 0,
+        UsesPerDay: 0,
+        RoomId : 0
+    }
+};
 
-
+let addTicket = false;
 
 function NewClientComponent(props){
 
     const [showExtra, toggle] = useState(false);
     const [rooms, setRooms] = useState([]);
     const [error, setError] = useState(false);
+    const [reloadUsers, reloadRequest] = useState(false);
     
-    let formInfo = {
-        client :{
-            Name: "",
-            Email: "",
-            Telephone: "",
-            Address:"",
-            CNP:""
-        },
-        ticket : {
-            ValidDays: 0,
-            MaxUsages : 0,
-            UsesPerDay: 0,
-            RoomId : 0
-        }
-    };
-
     
     useEffect( () =>{
-        console.log("request");
-
         requestRooms();
 
         async function requestRooms(){
@@ -45,15 +44,49 @@ function NewClientComponent(props){
           }
     },[]);
 
-
-    function saveFormInfo(){
-        console.log(formInfo);
-    }
+    async function saveFormInfo(){
+        console.log(formInfo['client']);
     
+        if (inputsAreValid()){
+            let response = await fetch('https://localhost:44312/api/Client/RegisterClient', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formInfo['client'])
+            });
+    
+            if (!response.ok){
+                alert("Error: Couldn't save client info!");
+                return;
+            }
+            
+            if (showExtra){
+                response = await fetch('https://localhost:44309/api/Ticket/RegisterTicket',{
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formInfo['ticket'])
+                });
+        
+                if (!response.ok){
+                    alert("Error: Coulnd't save ticket info!");
+                    return;
+                }
+            }
+           
+        }    
+        else{
+            alert("Invalid fields!");
+        }
+    
+        props.requestUsers();    
+    }
     
 
     let exFileds;
-    if (showExtra) exFileds = extraFields(rooms);
+    if (showExtra) exFileds = extraFields(rooms, formInfo);
 
     if (!props.show) return (<div></div>)
     else
@@ -117,7 +150,11 @@ function NewClientComponent(props){
             </Form.Group>
 
             <Form.Check 
-            onClick={ () => toggle(!showExtra)}
+            onClick={ () => {
+                toggle(!showExtra);
+                addTicket = !addTicket;
+            }
+            }
             type='checkbox'
             label='AddTicket'
             />
@@ -132,36 +169,71 @@ function NewClientComponent(props){
 
 
 
+function inputsAreValid(){
+    let keys = Object.keys(formInfo['client']);
+
+    for (let i = 0; i < keys.length; i++){
+        if (formInfo['client'][keys[i]] === ""){
+            return false;
+        } 
+    }
+
+    if (addTicket){
+        keys = Object.keys(formInfo['ticket']);
+        for (let i = 0; i < keys.length; i++){
+            if (formInfo['ticket'][keys[i]] === ""){
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
 
 
-function extraFields(rooms){
+function extraFields(rooms,formInfo){
     return(
         <Form>
             <Form.Group as={Row} controlId="validDays_input">
                 <Form.Label column sm="2"> Valid days </Form.Label>
                 <Col sm="10">
-                    <Form.Control type='number' placeholder="1" />
+                    <Form.Control type='number' placeholder="1" 
+                     onChange = { event =>{
+                        formInfo.ticket.ValidDays = event.target.value
+                     }}/>
                 </Col>
             </Form.Group>
             <Form.Group as={Row} controlId="numOfUsages_input">
-                <Form.Label column sm="2"> Number of usages </Form.Label>
+                <Form.Label column sm="2"> Max usages </Form.Label>
                 <Col sm="10">
-                    <Form.Control type='number'placeholder="1" />
+                    <Form.Control type='number'placeholder="1"
+                     onChange = { event =>{
+                        formInfo.ticket.MaxUsages = event.target.value
+                     }}
+                      />
                 </Col>
             </Form.Group>
             <Form.Group as={Row} controlId="numOfUsagesPerDay_input">
                 <Form.Label column sm="2"> Number of usages per day </Form.Label>
                 <Col sm="10">
-                    <Form.Control type='number' placeholder="1" />
+                    <Form.Control type='number' placeholder="1"
+                     onChange = { event =>{
+                        formInfo.ticket.UsesPerDay = event.target.value
+                     }} />
                 </Col>
             </Form.Group>
 
             <Form.Group as={Row} controlId="room_input">
                 <Form.Label column sm="2"> Room </Form.Label>
                 <Col>
-                    <Form.Control as="select">
+                    <Form.Control as="select"
+                     onChange = { event =>{
+                        formInfo.ticket.RoomId = event.target.options[event.target.selectedIndex].id
+                     }}
+                    >
+                        <option></option>
                        {rooms.map(room =>
-                           <option key={room.id}> {room.name} </option>
+                           <option key={room.id} id={room.id}> {room.name} </option>
                        )}
                     </Form.Control>
                 </Col>

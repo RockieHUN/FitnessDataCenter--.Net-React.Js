@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using API.Database;
 using API.Models;
 using Microsoft.AspNetCore.Cors;
+using API.Views;
 
 namespace API.Controllers
 {
@@ -26,12 +27,10 @@ namespace API.Controllers
 
               
         [HttpGet("ListClients")]
-        public async Task<ActionResult<IEnumerable<Client>>> listClients()
+        public async Task<ActionResult<IEnumerable<ClientView>>> listClients()
         {
-            return await _context.client.ToListAsync();
+            return toClientViews( await _context.client.ToListAsync());
         }
-
-        
 
 
         [HttpGet("GetClient/{id}")]
@@ -48,7 +47,7 @@ namespace API.Controllers
         }
 
         [HttpPost("RegisterClient")]
-        public async Task<ActionResult<Client>> PostClient(Client client)
+        public async Task<ActionResult<Client>> RegisterClient(Client client)
         {
             _context.client.Add(client);
             try
@@ -86,7 +85,7 @@ namespace API.Controllers
             return NoContent();
         }
 
-        private bool ClientExists(double id)
+        private bool ClientExists(int id)
         {
             return _context.client.Any(e => e.id == id);
         }
@@ -133,7 +132,6 @@ namespace API.Controllers
                 Email = "asd@asd.com",
                 RegistrationDate = DateTime.Now,
                 CNP = "2211334121234",
-                BarCode = "21301",
                 IsDeleted = false
             }
            );
@@ -145,7 +143,6 @@ namespace API.Controllers
                 Email = "asd2@asd.com",
                 RegistrationDate = DateTime.Now,
                 CNP = "22661334121234",
-                BarCode = "91291",
                 IsDeleted = false
             }
             );
@@ -168,6 +165,26 @@ namespace API.Controllers
         }
 
 
+        private List<ClientView> toClientViews(List<Client> clients)
+        {
+            var views = new List<ClientView>();
+            clients.ForEach(client =>
+           {
+               views.Add( new ClientView
+               {
+                   Name = client.Name,
+                   Address = client.Address,
+                   Telephone = client.Telephone,
+                   Email = client.Email,
+                   RegistrationDate = client.RegistrationDate.ToString("yyyy/MM/dd:HH/mm/ss"),
+                   CNP = client.CNP,
+                   BarCode = client.BarCode,
+                   IsDeleted = client.IsDeleted
+               }
+                   );
+           });
+            return views;
+        }
         
     }
 }
