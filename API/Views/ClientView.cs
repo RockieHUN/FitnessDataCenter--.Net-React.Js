@@ -1,11 +1,12 @@
-﻿using System;
+﻿using API.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace API.Views
 {
-    public class ClientView
+    public class ClientView : Document
     {
         public string Name { get; set; }
         public string Address { get; set; }

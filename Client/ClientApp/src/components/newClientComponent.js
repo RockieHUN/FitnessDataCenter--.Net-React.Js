@@ -3,7 +3,6 @@ import {Form} from 'react-bootstrap';
 import {Row} from 'react-bootstrap';
 import {Col} from 'react-bootstrap';
 import {Button} from 'react-bootstrap';
-import { propTypes } from 'react-bootstrap/esm/Image';
 
 let formInfo = {
     client :{
@@ -14,10 +13,12 @@ let formInfo = {
         CNP:""
     },
     ticket : {
+        Price : 50,
         ValidDays: 0,
         MaxUsages : 0,
         UsesPerDay: 0,
-        RoomId : 0
+        RoomId : 0,
+        ValidUntil :""
     }
 };
 
@@ -45,33 +46,37 @@ function NewClientComponent(props){
     },[]);
 
     async function saveFormInfo(){
-        console.log(formInfo['client']);
+        console.log(formInfo);
     
         if (inputsAreValid()){
-            let response = await fetch('https://localhost:44312/api/Client/RegisterClient', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(formInfo['client'])
-            });
-    
-            if (!response.ok){
-                alert("Error: Couldn't save client info!");
-                return;
-            }
-            
-            if (showExtra){
-                response = await fetch('https://localhost:44309/api/Ticket/RegisterTicket',{
+            if (!showExtra){
+                let response = await fetch('https://localhost:44312/api/Client/RegisterClient', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify(formInfo['ticket'])
+                    body: JSON.stringify(formInfo['client'])
+                });
+        
+                if (!response.ok){
+                    alert("Error: Couldn't save client info!");
+                    return;
+                }
+            }
+           
+            
+            if (showExtra){
+                let response = await fetch('https://localhost:44312/api/Client/RegisterClientWithTicket',{
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formInfo)
                 });
         
                 if (!response.ok){
                     alert("Error: Coulnd't save ticket info!");
+                    console.log(response.body);
                     return;
                 }
             }
@@ -238,8 +243,29 @@ function extraFields(rooms,formInfo){
                     </Form.Control>
                 </Col>
             </Form.Group>
+            <Form.Group as={Row} controlId="numOfUsagesPerDay_input">
+                <Form.Label column sm="2"> Valid until </Form.Label>
+                <Col sm="10">
+                    <Form.Control type='date'
+                     onChange = { event =>{
+                        formInfo.ticket.ValidUntil =  new Date(event.target.value + 'T00:00');
+                     }} />
+                </Col>
+            </Form.Group>
         </Form>   
     )
+}
+
+function dateToDateTime(value){
+    let date = Date.parse(value);
+    var day = date.getDate();       
+    var month = date.getMonth() + 1;  
+    var year = date.getFullYear(); 
+    var hour = date.getHours();   
+    var minute = date.getMinutes(); 
+    var second = date.getSeconds(); 
+
+    var time = day + "/" + month + "/" + year + " " + hour + ':' + minute + ':' + second; 
 }
 
 export default NewClientComponent;

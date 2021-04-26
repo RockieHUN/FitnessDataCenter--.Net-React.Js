@@ -46,6 +46,12 @@ namespace API.Controllers
             return CreatedAtAction("GetTicket", new { id = ticket.id }, ticket);
         }
 
+        [HttpGet("ListTickets")]
+        public async Task<ActionResult<IEnumerable<Ticket>>> ListTickets()
+        {
+            return await _context.ticket.ToListAsync();
+        }
+
         private bool TicketExists(int id)
         {
             return _context.ticket.Any(e => e.id == id);

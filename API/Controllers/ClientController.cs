@@ -9,6 +9,7 @@ using API.Database;
 using API.Models;
 using Microsoft.AspNetCore.Cors;
 using API.Views;
+using System.Diagnostics;
 
 namespace API.Controllers
 {
@@ -46,6 +47,18 @@ namespace API.Controllers
             return client;
         }
 
+        [HttpGet("SearchClient/{barcode}")]
+        public async Task<ActionResult<ClientView>> SearchClient(int barcode)
+        {
+            var list = await _context.client.ToListAsync();
+            var client = list.Find(element => element.BarCode == barcode);
+            if (client == null)
+            {
+                return NotFound();
+            }
+            return toClientView(client);
+        }
+
         [HttpPost("RegisterClient")]
         public async Task<ActionResult<Client>> RegisterClient(Client client)
         {
@@ -56,19 +69,44 @@ namespace API.Controllers
             }
             catch (DbUpdateException)
             {
-                if (ClientExists(client.id))
-                {
-                    return Conflict();
-                }
-                else
-                {
-                    throw;
-                }
+                if (ClientExists(client.id)) return Conflict();
+                else throw;
             }
 
-            return CreatedAtAction("GetClient", new { id = client.id }, client);
+            return NoContent();
         }
 
+        [HttpPost("RegisterClientWithTicket")]
+        public async Task<ActionResult<ClientAndTicket>> RegisterClientWithTicket(ClientAndTicket clientAndTicket)
+        {
+            var client = clientAndTicket.client;
+            var ticket = clientAndTicket.ticket;
+
+            _context.client.Add(client);
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException)
+            {
+                if (ClientExists(client.id)) return Conflict();
+                else throw;
+            }
+
+            _context.ticket.Add(ticket);
+            ticket.ClientId = client.id;
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch(DbUpdateException)
+            {
+                if (TicketExists(ticket.id)) return Conflict();
+                else throw;
+            }
+
+            return NoContent();
+        }
         
         [HttpDelete("DeleteClient/{id}")]
         public async Task<IActionResult> DeleteClient(int id)
@@ -88,6 +126,11 @@ namespace API.Controllers
         private bool ClientExists(int id)
         {
             return _context.client.Any(e => e.id == id);
+        }
+
+        private bool TicketExists(int id)
+        {
+            return _context.ticket.Any(e => e.id == id);
         }
 
 
@@ -121,69 +164,31 @@ namespace API.Controllers
             return NoContent();
         }*/
 
-        [HttpGet("CreateDummy")]
-        public async Task<IActionResult> CreateDummy()
-        {
-            _context.client.Add(new Client
-            {
-                Name = "Joco",
-                Address = "Tg. Mures",
-                Telephone = "072222222222",
-                Email = "asd@asd.com",
-                RegistrationDate = DateTime.Now,
-                CNP = "2211334121234",
-                IsDeleted = false
-            }
-           );
-            _context.client.Add(new Client
-            {
-                Name = "Csilla",
-                Address = "Cluj Napoca",
-                Telephone = "072222222222",
-                Email = "asd2@asd.com",
-                RegistrationDate = DateTime.Now,
-                CNP = "22661334121234",
-                IsDeleted = false
-            }
-            );
-
-            _context.room.Add(new Room
-            {
-                Name = "A12"
-            });
-
-            _context.room.Add(new Room
-            {
-                Name = "B22"
-            });
-
-
-
-
-            _ = _context.SaveChangesAsync();
-            return NoContent();
-        }
-
 
         private List<ClientView> toClientViews(List<Client> clients)
         {
             var views = new List<ClientView>();
             clients.ForEach(client =>
            {
-               views.Add( new ClientView
-               {
-                   Name = client.Name,
-                   Address = client.Address,
-                   Telephone = client.Telephone,
-                   Email = client.Email,
-                   RegistrationDate = client.RegistrationDate.ToString("yyyy/MM/dd:HH/mm/ss"),
-                   CNP = client.CNP,
-                   BarCode = client.BarCode,
-                   IsDeleted = client.IsDeleted
-               }
-                   );
+               views.Add( toClientView(client));
            });
             return views;
+        }
+
+        private ClientView toClientView( Client client)
+        {
+            return new ClientView
+            {
+                id = client.id,
+                Name = client.Name,
+                Address = client.Address,
+                Telephone = client.Telephone,
+                Email = client.Email,
+                RegistrationDate = client.RegistrationDate.ToString("yyyy/MM/dd  HH:mm:ss"),
+                CNP = client.CNP,
+                BarCode = client.BarCode,
+                IsDeleted = client.IsDeleted
+            };
         }
         
     }

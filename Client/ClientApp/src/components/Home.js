@@ -1,6 +1,10 @@
 import React, { Component } from 'react';
 import NewClientComponent from './NewClientComponent';
+import SearchComponent from './SearchComponent';
 import {Button} from 'react-bootstrap';
+import './styles.css';
+import * as FileSaver from "file-saver";
+import * as XLSX from "xlsx";
 
 export class Home extends Component {
   static displayName = Home.name;
@@ -12,6 +16,7 @@ export class Home extends Component {
     //bindings
     this.toggleNewClientForm = this.toggleNewClientForm.bind(this);
     this.requestUsers = this.requestUsers.bind(this);
+    this.saveToXlsx = this.saveToXlsx.bind(this);
   }
 
   componentDidMount(){
@@ -31,9 +36,22 @@ export class Home extends Component {
     this.setState({showNewClientForm : !this.state.showNewClientForm});  
   }
 
+  saveToXlsx(){
+    const fileName = "export";
+    const fileType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
+    const fileExtension = ".xlsx";
+
+    const ws = XLSX.utils.json_to_sheet(this.state.clients);
+    const wb = { Sheets: { data: ws }, SheetNames: ["data"] };
+    const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+    const data = new Blob([excelBuffer], { type: fileType });
+    FileSaver.saveAs(data, fileName + fileExtension);
+  }
+
   createUserTable(clients){
     return (
-      <table className='table table-striped' aria-labelledby="tabelLabel">
+      <div>
+        <table className='table table-striped' aria-labelledby="tabelLabel">
         <thead>
           <tr>
             <th>Name</th>
@@ -59,6 +77,9 @@ export class Home extends Component {
           )}
         </tbody>
       </table>
+      <Button onClick={this.saveToXlsx}>Save to xlsx</Button>
+      </div>
+      
     )
   }
 
@@ -71,11 +92,14 @@ export class Home extends Component {
 
     return (
       <div>
-        <h1> Fitness Data Center</h1>
+        <h1 align="center"> Fitness Data Center</h1>
+        <br></br>
+        <SearchComponent id="searchComponent"/>
+
+        <br></br><br></br>
         <div> 
           <Button onClick = {this.toggleNewClientForm}> New Client</Button>
         </div>
-
         <NewClientComponent show={this.state.showNewClientForm} requestUsers={this.requestUsers} />
         
         <div>
