@@ -1,5 +1,6 @@
 ﻿using API.Database;
 using API.Models;
+using API.Views;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -57,5 +58,39 @@ namespace API.Controllers
             return _context.ticket.Any(e => e.id == id);
         }
 
+        [HttpGet("ListClientTickets/{clientId}")]
+        public async Task<ActionResult<IEnumerable<TicketView>>> ListClientTickets(int clientId)
+        {
+            return toViews(await _context.ticket.Where(ticket => ticket.ClientId == clientId).ToListAsync());
+        }
+
+
+        private TicketView toView(Ticket ticket)
+        {
+            return new TicketView
+            {
+                ClientId = ticket.ClientId,
+                RoomId = ticket.RoomId,
+                RoomName = ticket.RoomName,
+                Price = ticket.Price,
+                ValidDays = ticket.ValidDays, 
+                MaxUsages = ticket.MaxUsages,
+                UsesPerDay = ticket.UsesPerDay,
+                UsedCounter = ticket.UsedCounter,
+                ValidUntil = ticket.ValidUntil.ToString("yyyy/MM/dd  HH:mm:ss"),
+                PurchaseDate =ticket.PurchaseDate.ToString("yyyy/MM/dd  HH:mm:ss")
+            };
+        }
+
+        private List<TicketView> toViews(List<Ticket> tickets)
+        {
+            var views = new List<TicketView>();
+            tickets.ForEach(ticket =>
+            {
+                views.Add(toView(ticket));
+            });
+
+            return views;
+        }
     }
 }

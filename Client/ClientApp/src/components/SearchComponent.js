@@ -7,7 +7,9 @@ import {Button} from 'react-bootstrap';
 function SearchComponent(){
 
     const [searched, setSearched] = useState(false);
-    const [searchResult, setSearchResult] = useState({});
+    const [searchResultClient, setSearchResultClient] = useState({});
+    const [searchResultTickets, setSearchResultTickets] = useState([]);
+
     let searchterm = 0;
 
     let output;
@@ -16,18 +18,29 @@ function SearchComponent(){
     }
 
     async function searchClient(){
-        const response = await fetch('https://localhost:44312/api/Client/SearchClient/'+searchterm,{
+        let response = await fetch('https://localhost:44312/api/Client/SearchClient/'+searchterm,{
                     method: 'GET'
                 });
 
         if (response.ok){
             let data = await response.json()
-            setSearchResult(data);
+            setSearchResultClient(data);
             setSearched(true);
+
+            response = await fetch('https://localhost:44312/api/Ticket/ListClientTickets/'+data.id,{
+                method: 'GET'
+            });
+
+            if (response.ok){
+                setSearchResultTickets( await response.json());
+            }
         }
         else{
             setSearched(false);
         }  
+
+        
+        
     }
 
     function showResults(){
@@ -38,52 +51,84 @@ function SearchComponent(){
                     <Form.Label column sm="2"> Name: </Form.Label>
                     <Col sm="5">
                         <Form.Control readOnly
-                         value={searchResult.name}/>
+                         value={searchResultClient.name}/>
                     </Col> 
                 </Form.Group>
                 <Form.Group as={Row} controlId = "email">
                     <Form.Label column sm="2"> Email: </Form.Label>
                     <Col sm="5">
                         <Form.Control  readOnly
-                        value={searchResult.email}/>
+                        value={searchResultClient.email}/>
                     </Col> 
                 </Form.Group>
                 <Form.Group as={Row} controlId = "telephone">
                     <Form.Label column sm="2"> Telephone: </Form.Label>
                     <Col sm="5">
                         <Form.Control  readOnly
-                        value={searchResult.telephone}/>
+                        value={searchResultClient.telephone}/>
                     </Col> 
                 </Form.Group>
                 <Form.Group as={Row} controlId = "address">
                     <Form.Label column sm="2"> Address: </Form.Label>
                     <Col sm="5">
                         <Form.Control  readOnly
-                        value={searchResult.address}/>
+                        value={searchResultClient.address}/>
                     </Col> 
                 </Form.Group>
                 <Form.Group as={Row} controlId = "cnp">
                     <Form.Label column sm="2"> CNP: </Form.Label>
                     <Col sm="5">
                         <Form.Control  readOnly
-                        value={searchResult.cnp}/>
+                        value={searchResultClient.cnp}/>
                     </Col> 
                 </Form.Group>
                 <Form.Group as={Row} controlId = "barcode">
                     <Form.Label column sm="2"> Barcode: </Form.Label>
                     <Col sm="5">
                         <Form.Control  readOnly
-                        value={searchResult.barCode}/>
+                        value={searchResultClient.barCode}/>
                     </Col> 
                 </Form.Group>
                 <Form.Group as={Row} controlId = "registration_date">
                     <Form.Label column sm="2"> Registration Date: </Form.Label>
                     <Col sm="5">
                         <Form.Control  readOnly
-                        value={searchResult.registrationDate}/>
+                        value={searchResultClient.registrationDate}/>
                     </Col> 
                 </Form.Group>
             </Form>
+
+            <h2>Tickets</h2>
+            <table className='table table-striped' aria-labelledby="tabelLabel">
+                <thead>
+                    <tr>
+                        <th>Room</th>
+                        <th>Price</th>
+                        <th>Valid Days</th>
+                        <th>Max Usages</th>
+                        <th>Uses per Day</th>
+                        <th>Used Counter</th>
+                        <th>Purchase Date</th>
+                        <th>Valid Until</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                {searchResultTickets.map(ticket =>
+                    <tr key={ticket.id}>
+                        <td>{ticket.roomName}</td>
+                        <td>{ticket.price}</td>
+                        <td>{ticket.validDays}</td>
+                        <td>{ticket.maxUsages}</td>
+                        <td>{ticket.usesPerDay}</td>
+                        <td>{ticket.usedCounter}</td>
+                        <td>{ticket.purchaseDate}</td>
+                        <td>{ticket.validUntil}</td>
+                        <td><Button id = {ticket.id}> USE </Button></td>
+                    </tr>
+                )}
+                </tbody>
+            </table>
         </div>
         )  
     }

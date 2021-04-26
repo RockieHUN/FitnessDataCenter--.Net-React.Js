@@ -18,6 +18,7 @@ let formInfo = {
         MaxUsages : 0,
         UsesPerDay: 0,
         RoomId : 0,
+        RoomName : "",
         ValidUntil :""
     }
 };
@@ -233,7 +234,8 @@ function extraFields(rooms,formInfo){
                 <Col>
                     <Form.Control as="select"
                      onChange = { event =>{
-                        formInfo.ticket.RoomId = event.target.options[event.target.selectedIndex].id
+                        formInfo.ticket.RoomId = event.target.options[event.target.selectedIndex].id;
+                        formInfo.ticket.RoomName = event.target.value;
                      }}
                     >
                         <option></option>

@@ -1,11 +1,12 @@
-﻿using System;
+﻿using API.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace API.Models
+namespace API.Views
 {
-    public class Ticket: Document
+    public class TicketView : Document
     {
         public int ClientId { get; set; } = 0;
         public int RoomId { get; set; }
@@ -15,7 +16,7 @@ namespace API.Models
         public int MaxUsages { get; set; }
         public int UsesPerDay { get; set; }
         public int UsedCounter { get; set; } = 0;
-        public DateTime ValidUntil { get; set; }
-        public DateTime PurchaseDate { get; set; } = DateTime.Now;
+        public string ValidUntil { get; set; } = "";
+        public string PurchaseDate { get; set; } = "";
     }
 }

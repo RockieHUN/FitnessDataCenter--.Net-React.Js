@@ -23,6 +23,7 @@ namespace API.Controllers
         [HttpGet("CreateDummy")]
         public async Task<IActionResult> CreateDummy()
         {
+            //CLIENTS
             _context.client.Add(new Client
             {
                 Name = "Joco",
@@ -46,6 +47,7 @@ namespace API.Controllers
             }
             );
 
+            //ROOMS
             _context.room.Add(new Room
             {
                 Name = "A12"
@@ -56,8 +58,34 @@ namespace API.Controllers
                 Name = "B22"
             });
 
+            //TICKETS
+            _context.ticket.Add( new Ticket
+            {
+                ClientId = 2,
+                RoomId = 1,
+                RoomName = "A12",
+                Price = 50,
+                ValidDays = 3,
+                MaxUsages = 10,
+                UsesPerDay = 5,
+                UsedCounter = 0,
+                ValidUntil = DateTime.Now,
+                PurchaseDate = DateTime.Now
+            });
 
-
+            _context.ticket.Add(new Ticket
+            {
+                ClientId = 2,
+                RoomId = 2,
+                RoomName = "B22",
+                Price = 50,
+                ValidDays = 6,
+                MaxUsages = 15,
+                UsesPerDay = 5,
+                UsedCounter = 0,
+                ValidUntil = DateTime.Now,
+                PurchaseDate = DateTime.Now
+            });
 
             _ = _context.SaveChangesAsync();
             return NoContent();
