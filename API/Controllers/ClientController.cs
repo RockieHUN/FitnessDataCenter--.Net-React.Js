@@ -80,28 +80,39 @@ namespace API.Controllers
         public async Task<ActionResult<ClientAndTicket>> RegisterClientWithTicket(ClientAndTicket clientAndTicket)
         {
             var client = clientAndTicket.client;
-            var ticket = clientAndTicket.ticket;
+            var ticketTypeId = clientAndTicket.ticketTypeId.ticketTypeId;
 
             _context.client.Add(client);
+           
+
+            if (!TicketTypeExists(ticketTypeId))
+            {
+                return BadRequest();
+            }
+
+            var ticketType = await _context.ticketType.FirstOrDefaultAsync(ticketType => ticketType.id == ticketTypeId);
+            var ticket = new Ticket
+            {
+                ClientId = client.id,
+                RoomId = ticketType.RoomId,
+                RoomName = ticketType.RoomName,
+                Price = ticketType.Price,
+                ValidDays = ticketType.ValidDays,
+                MaxUsages = ticketType.MaxUsages,
+                UsesPerDay = ticketType.UsesPerDay,
+                UsedCounter = 0,
+                ValidUntil = (DateTime.Now).AddDays(ticketType.ValidDays)
+            };
+
+            _context.ticket.Add(ticket);
+           
             try
             {
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateException)
             {
-                if (ClientExists(client.id)) return Conflict();
-                else throw;
-            }
-
-            _context.ticket.Add(ticket);
-            ticket.ClientId = client.id;
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch(DbUpdateException)
-            {
-                if (TicketExists(ticket.id)) return Conflict();
+                if (ClientExists(client.id) || TicketExists(ticket.id)) return Conflict();
                 else throw;
             }
 
@@ -164,6 +175,7 @@ namespace API.Controllers
             return NoContent();
         }*/
 
+        //PRIVATE FUNCTIONS
 
         private List<ClientView> toClientViews(List<Client> clients)
         {
@@ -190,6 +202,11 @@ namespace API.Controllers
                 IsDeleted = client.IsDeleted
             };
         }
-        
+
+        private bool TicketTypeExists(int id)
+        {
+            return _context.ticketType.Any(e => e.id == id);
+        }
+
     }
 }

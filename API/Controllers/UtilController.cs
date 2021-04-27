@@ -87,6 +87,18 @@ namespace API.Controllers
                 PurchaseDate = DateTime.Now
             });
 
+            _context.ticketType.Add(new TicketType
+            {
+                id = 1,
+                TicketName = "Average",
+                RoomId = 1,
+                RoomName = "A12",
+                Price = 50,
+                ValidDays = 10,
+                MaxUsages = 20,
+                UsesPerDay = 2
+            });
+
             _ = _context.SaveChangesAsync();
             return NoContent();
         }

@@ -17,5 +17,6 @@ namespace API.Database
         public DbSet<Client> client { get; set; }
         public DbSet<Room> room { get; set; }
         public DbSet<Ticket> ticket { get; set; }
+        public DbSet<TicketType> ticketType { get; set; }
     }
 }

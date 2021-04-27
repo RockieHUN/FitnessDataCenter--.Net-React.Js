@@ -1,21 +1,35 @@
-import React, {useState}  from 'react';
+import React, {useState, useEffect}  from 'react';
 import {Form} from 'react-bootstrap';
 import {Row} from 'react-bootstrap';
 import {Col} from 'react-bootstrap';
 import {Button} from 'react-bootstrap';
 
-function SearchComponent(){
+function SearchComponent(props){
 
     const [searched, setSearched] = useState(false);
     const [searchResultClient, setSearchResultClient] = useState({});
     const [searchResultTickets, setSearchResultTickets] = useState([]);
+    const [ticketTypes, setTicketTypes] = useState([]);
+
+    useEffect( () =>{
+        requestTicketTypes();
+    },[]);
 
     let searchterm = 0;
+    let newTicketTypeId = 0;
 
     let output;
     if (searched){
         output = showResults();
     }
+
+    async function requestTicketTypes(){
+        const response = await fetch('https://localhost:44312/api/Ticket/ListTicketTypes');
+            if(response.ok) {
+                let data = await response.json();
+                setTicketTypes(data);
+            }
+      }
 
     async function searchClient(){
         let response = await fetch('https://localhost:44312/api/Client/SearchClient/'+searchterm,{
@@ -37,11 +51,21 @@ function SearchComponent(){
         }
         else{
             setSearched(false);
-        }  
-
-        
-        
+        }    
     }
+
+    async function addNewTicket(){
+        let response = await fetch('https://localhost:44312/api/Ticket/RegisterTicket/'+searchResultClient.id+"/"+newTicketTypeId,{
+                    method: 'GET'
+                });
+        if (!response.ok) alert("Failed to add ticket!");
+        else{
+            alert("Ticket added succesfully!");
+            requestTicketTypes();
+        } 
+    }
+
+    
 
     function showResults(){
         return(
@@ -99,6 +123,24 @@ function SearchComponent(){
             </Form>
 
             <h2>Tickets</h2>
+            <Form>
+                <Form.Group as={Row} controlId = "newTicket_input">
+                    <Form.Label column sm="2"> Add new ticket: </Form.Label>
+                    <Col sm="5">
+                    <Form.Control as="select"
+                        onChange = { event =>{
+                            newTicketTypeId = event.target.options[event.target.selectedIndex].id;
+                        }}
+                        >
+                        <option></option>
+                        {ticketTypes.map(ticketType =>
+                            <option key={ticketType.id} id={ticketType.id}> {ticketType.ticketName} </option>
+                        )}
+                    </Form.Control>
+                    </Col>
+                    <Button onClick={addNewTicket}> Add ticket</Button>
+                </Form.Group>
+            </Form>
             <table className='table table-striped' aria-labelledby="tabelLabel">
                 <thead>
                     <tr>

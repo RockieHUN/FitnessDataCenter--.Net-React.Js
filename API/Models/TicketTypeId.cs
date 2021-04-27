@@ -5,9 +5,8 @@ using System.Threading.Tasks;
 
 namespace API.Models
 {
-    public class ClientAndTicket
+    public class TicketTypeId
     {
-        public Client client {get; set;}
-        public TicketTypeId ticketTypeId {get; set; }
+        public int ticketTypeId { get; set; } = 0;
     }
 }

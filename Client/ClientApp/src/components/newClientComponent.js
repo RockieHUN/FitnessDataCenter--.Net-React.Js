@@ -12,14 +12,8 @@ let formInfo = {
         Address:"",
         CNP:""
     },
-    ticket : {
-        Price : 50,
-        ValidDays: 0,
-        MaxUsages : 0,
-        UsesPerDay: 0,
-        RoomId : 0,
-        RoomName : "",
-        ValidUntil :""
+    ticketTypeId : {
+        ticketTypeId : 0
     }
 };
 
@@ -28,20 +22,20 @@ let addTicket = false;
 function NewClientComponent(props){
 
     const [showExtra, toggle] = useState(false);
-    const [rooms, setRooms] = useState([]);
+    const [ticketTypes, setTicketTypes] = useState([]);
     const [error, setError] = useState(false);
     const [reloadUsers, reloadRequest] = useState(false);
     
     
     useEffect( () =>{
-        requestRooms();
+        requestTicketTypes();
 
-        async function requestRooms(){
-            const response = await fetch('https://localhost:44312/api/Room/ListRooms');
+        async function requestTicketTypes(){
+            const response = await fetch('https://localhost:44312/api/Ticket/ListTicketTypes');
                 if(!response.ok) setError(true);
                 else{
                     let data = await response.json();
-                    setRooms(data);
+                    setTicketTypes(data);
                 }
           }
     },[]);
@@ -92,7 +86,7 @@ function NewClientComponent(props){
     
 
     let exFileds;
-    if (showExtra) exFileds = extraFields(rooms, formInfo);
+    if (showExtra) exFileds = extraFields(ticketTypes, formInfo);
 
     if (!props.show) return (<div></div>)
     else
@@ -185,11 +179,8 @@ function inputsAreValid(){
     }
 
     if (addTicket){
-        keys = Object.keys(formInfo['ticket']);
-        for (let i = 0; i < keys.length; i++){
-            if (formInfo['ticket'][keys[i]] === ""){
-                return false;
-            }
+        if (formInfo.ticketTypeId.ticketTypeId === 0 ){
+            return false;
         }
     }
 
@@ -197,63 +188,26 @@ function inputsAreValid(){
 }
 
 
-function extraFields(rooms,formInfo){
+function extraFields(ticketTypes,formInfo){
     return(
         <Form>
-            <Form.Group as={Row} controlId="validDays_input">
-                <Form.Label column sm="2"> Valid days </Form.Label>
-                <Col sm="10">
-                    <Form.Control type='number' placeholder="1" 
-                     onChange = { event =>{
-                        formInfo.ticket.ValidDays = event.target.value
-                     }}/>
-                </Col>
-            </Form.Group>
-            <Form.Group as={Row} controlId="numOfUsages_input">
-                <Form.Label column sm="2"> Max usages </Form.Label>
-                <Col sm="10">
-                    <Form.Control type='number'placeholder="1"
-                     onChange = { event =>{
-                        formInfo.ticket.MaxUsages = event.target.value
-                     }}
-                      />
-                </Col>
-            </Form.Group>
-            <Form.Group as={Row} controlId="numOfUsagesPerDay_input">
-                <Form.Label column sm="2"> Number of usages per day </Form.Label>
-                <Col sm="10">
-                    <Form.Control type='number' placeholder="1"
-                     onChange = { event =>{
-                        formInfo.ticket.UsesPerDay = event.target.value
-                     }} />
-                </Col>
-            </Form.Group>
-
+        
             <Form.Group as={Row} controlId="room_input">
-                <Form.Label column sm="2"> Room </Form.Label>
+                <Form.Label column sm="2"> Ticket </Form.Label>
                 <Col>
                     <Form.Control as="select"
                      onChange = { event =>{
-                        formInfo.ticket.RoomId = event.target.options[event.target.selectedIndex].id;
-                        formInfo.ticket.RoomName = event.target.value;
+                        formInfo.ticketTypeId.ticketTypeId= event.target.options[event.target.selectedIndex].id;
                      }}
                     >
                         <option></option>
-                       {rooms.map(room =>
-                           <option key={room.id} id={room.id}> {room.name} </option>
+                       {ticketTypes.map(ticketType =>
+                           <option key={ticketType.id} id={ticketType.id}> {ticketType.ticketName} </option>
                        )}
                     </Form.Control>
                 </Col>
             </Form.Group>
-            <Form.Group as={Row} controlId="numOfUsagesPerDay_input">
-                <Form.Label column sm="2"> Valid until </Form.Label>
-                <Col sm="10">
-                    <Form.Control type='date'
-                     onChange = { event =>{
-                        formInfo.ticket.ValidUntil =  new Date(event.target.value + 'T00:00');
-                     }} />
-                </Col>
-            </Form.Group>
+          
         </Form>   
     )
 }
