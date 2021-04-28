@@ -65,7 +65,6 @@ namespace API.Controllers
             return NoContent();
         }
 
-       
 
         [HttpGet("ListTickets")]
         public async Task<ActionResult<IEnumerable<Ticket>>> ListTickets()
@@ -146,6 +145,7 @@ namespace API.Controllers
         {
             return new TicketView
             {
+                id = ticket.id,
                 ClientId = ticket.ClientId,
                 RoomId = ticket.RoomId,
                 RoomName = ticket.RoomName,

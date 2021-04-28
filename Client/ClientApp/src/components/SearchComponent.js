@@ -10,12 +10,13 @@ function SearchComponent(props){
     const [searchResultClient, setSearchResultClient] = useState({});
     const [searchResultTickets, setSearchResultTickets] = useState([]);
     const [ticketTypes, setTicketTypes] = useState([]);
+    const [searchterm, setSearchTerm] = useState(0);
 
     useEffect( () =>{
         requestTicketTypes();
     },[]);
 
-    let searchterm = 0;
+
     let newTicketTypeId = 0;
 
     let output;
@@ -46,7 +47,8 @@ function SearchComponent(props){
             });
 
             if (response.ok){
-                setSearchResultTickets( await response.json());
+                data = await response.json();
+                setSearchResultTickets(data);
             }
         }
         else{
@@ -61,15 +63,34 @@ function SearchComponent(props){
         if (!response.ok) alert("Failed to add ticket!");
         else{
             alert("Ticket added succesfully!");
-            requestTicketTypes();
+            searchClient();
         } 
     }
 
+    async function enterWithTicket(ticketId){
+        let response = await fetch('https://localhost:44312/api/Ticket/UseTicket/'+ticketId,{
+            method: 'GET'
+        });
+        if (response.ok){
+            alert("Ticket used!");
+            searchClient();
+        }
+        else{
+            alert("Failed to use ticket!");
+        }
+    }
+
+    function isValidDate(str){
+        let date = Date.parse(str);
+        if (date > Date.now()) return true;
+        else return false;
+    }
     
 
     function showResults(){
         return(
         <div>
+            <Button onClick={(event)=>{setSearched(false)}}>Hide</Button>
             <Form>
                 <Form.Group as={Row} controlId = "name">
                     <Form.Label column sm="2"> Name: </Form.Label>
@@ -166,7 +187,17 @@ function SearchComponent(props){
                         <td>{ticket.usedCounter}</td>
                         <td>{ticket.purchaseDate}</td>
                         <td>{ticket.validUntil}</td>
-                        <td><Button id = {ticket.id}> USE </Button></td>
+
+                        {isValidDate(ticket.validUntil) && (ticket.maxUsages > ticket.usedCounter)
+                        ? <td><Button id = {ticket.id}
+                            key = {ticket.id}
+                            onClick={(event)=>{
+                                enterWithTicket(event.target.id);
+                            }}
+                            > USE </Button></td>
+                        : <td><p>Expired</p></td>
+                    }
+                        
                     </tr>
                 )}
                 </tbody>
@@ -184,13 +215,13 @@ function SearchComponent(props){
                         <Form.Control placeholder="Barcode"
                         type = "number"
                         onChange={ (event) =>{
-                            searchterm = event.target.value
+                            setSearchTerm(event.target.value);
                         }}
                         />
                     </Col>
                     <Col >
                         <Button onClick={searchClient}> Search </Button>
-                    </Col>
+                    </Col>   
                 </Form.Group>
             </Form>
             {output}

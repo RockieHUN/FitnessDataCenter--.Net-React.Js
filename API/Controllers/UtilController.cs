@@ -99,6 +99,18 @@ namespace API.Controllers
                 UsesPerDay = 2
             });
 
+            _context.ticketType.Add(new TicketType
+            {
+                id = 2,
+                TicketName = "One Month Ticket",
+                RoomId = 1,
+                RoomName = "A12",
+                Price = 50,
+                ValidDays = 31,
+                MaxUsages = 31,
+                UsesPerDay = 2
+            });
+
             _ = _context.SaveChangesAsync();
             return NoContent();
         }
